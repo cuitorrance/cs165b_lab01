@@ -88,18 +88,15 @@ def train(x, y, alpha, lam, nepoch, param, epsilon):
             return param
     
 
-    
+# #validation phase
+# def validation(x,y, param):
 
-
-#validation phase
-def validation(x,y, param):
-
-#testing phase
-def test(x, param):
+# #testing phase
+# def test(x, param):
 
 
 #run for all epochs
-def SGDSolver(x, y, alpha = 0.XX, lam = XX, nepoch = XXX, epsilon = XX, param = [1, 1, 1, 1, 1,1,1]):
+def SGDSolver(x, y, alpha = 10, lam = 10, nepoch = 100, epsilon = 0.05, param = [1, 1, 1, 1, 1,1,1]):
     #add bias to weight
     param.append(1)
 
