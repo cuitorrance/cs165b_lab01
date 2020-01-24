@@ -44,14 +44,14 @@ for row in dataset:
     row[0] = 1
     del row[8]
 
-def predict(W, X_i):
+def predict(X_i, W):
     return np.sum(W*X_i)
-def Y_Hat(W, X):
-    return np.array([predict(W, X[i,:]) for i in np.arange(len(X))])
+def Y_Hat(X, W):
+    return np.array([predict(X[i,:],W) for i in np.arange(len(X))])
 def L(Y, Y_hat):
     return np.sum((Y - Y_hat)**2)*1/(len(Y))
 def e(X, Y, W): 
-    Y_hats = Y_Hat(W,X)
+    Y_hats = Y_Hat(X,W)
     l = L(Y, Y_hats)
     return l
 def e_prime(X, Y, W, lam):
@@ -59,6 +59,68 @@ def e_prime(X, Y, W, lam):
     ss_weights = np.sum(W**2)
     return ss_pred_err + lam*ss_weights
 
-#initialize starting weights as all ones
-weights = np.ones(8)
+def SGD_run_epoch(X, Y, W, lam, alpha):
+    n = len(X)    
+    indices = np.arange(0, n)
+    rand_indices = np.random.choice(indices, n, replace = False)
+    
+    yhat = Y_Hat(X,W)
+
+    for i in rand_indices:
+        W[i] = W[i] - ( alpha * (2(yhat[i] - Y[i]) * X[i]) )
+
+    return W
+
+# Calculate root mean squared error
+def mse(actual, predicted):
+	sum_error = 0.0
+	for i in range(len(actual)):
+		prediction_error = predicted[i] - actual[i]
+		sum_error += (prediction_error ** 2)
+	mean_error = sum_error / float(len(actual))
+	return mean_error
+
+#training phase
+def train(x, y, alpha, lam, nepoch, param, epsilon):
+    for i in range(nepoch):
+        param = SGD_run_epoch(x, y, param, lam, alpha)
+        if e_prime(x, y, param, lam, alpha) < epsilon:
+            return param
+    
+
+    
+
+
+#validation phase
+def validation(x,y, param):
+
+#testing phase
+def test(x, param):
+
+
+#run for all epochs
+def SGDSolver(x, y, alpha = 0.XX, lam = XX, nepoch = XXX, epsilon = XX, param = [1, 1, 1, 1, 1,1,1]):
+    #add bias to weight
+    param.append(1)
+
+    param = train(x, y, alpha, lam, nepoch, param, epsilon)
+
+    validation(x,y, param)
+
+    test(x,param)
+
+
+
+
+
+
+
+
+
+        
+
+    
+
+
+
 
