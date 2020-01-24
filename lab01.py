@@ -16,58 +16,49 @@ def load_csv(filename):
 			dataset.append(row)
 	return dataset
 
+# Convert string column to float
+def str_column_to_float(dataset, column):
+	for row in dataset:
+		row[column] = float(row[column].strip())
 
-#find min and max
-def dataset_minmax(dataset):
-	minmax = list()
-	for i in range(len(dataset[0])):
-		col_values = [row[i] for row in dataset]
-		value_min = min(col_values)
-		value_max = max(col_values)
-		minmax.append([value_min, value_max])
-	return minmax
+#input dataset
+dataset = load_csv('Admission_Predict.csv')
 
-# # Rescale dataset columns to the range 0-1
-# def normalize_dataset(dataset, minmax):
-# 	for row in dataset:
-# 		for i in range(len(row)):
-# 			row[i] = (row[i] - minmax[i][0]) / (minmax[i][1] - minmax[i][0])
+#delete first row
+del dataset[0]
 
-# Calculate root mean squared error
-def rmse_metric(actual, predicted):
-	sum_error = 0.0
-	for i in range(len(actual)):
-		prediction_error = predicted[i] - actual[i]
-		sum_error += (prediction_error ** 2)
-	mean_error = sum_error / float(len(actual))
-	return sqrt(mean_error)
+#convert string to float
+for i in range(len(dataset[0])):
+	str_column_to_float(dataset, i)
 
-# Make a prediction with coefficients
-def predict(row, coefficients):
-	yhat = coefficients[0]
-	for i in range(len(row)-1):
-		yhat += coefficients[i + 1] * row[i]
-	return yhat
+#get epxected values
+expected = np.zeros(400)
+i = 0
+for row in dataset:
+    expected[i] = row[8]
+    i = i +1
 
-# Estimate linear regression coefficients using stochastic gradient descent
-def coefficients_sgd(train, l_rate, n_epoch):
-	coef = [0.0 for i in range(len(train[0]))]
-	for epoch in range(n_epoch):
-		for row in train:
-			yhat = predict(row, coef)
-			error = yhat - row[-1]
-			coef[0] = coef[0] - l_rate * error
-			for i in range(len(row)-1):
-				coef[i + 1] = coef[i + 1] - l_rate * error * row[i]
-			# print(l_rate, n_epoch, error)
-	return coef
- 
-# Linear Regression Algorithm With Stochastic Gradient Descent
-def linear_regression_sgd(train, test, l_rate, n_epoch):
-	predictions = list()
-	coef = coefficients_sgd(train, l_rate, n_epoch)
-	for row in test:
-		yhat = predict(row, coef)
-		predictions.append(yhat)
-	return(predictions)
+#get parameters
+for row in dataset:
+    #set first column to bias = 1
+    row[0] = 1
+    del row[8]
+
+def predict(W, X_i):
+    return np.sum(W*X_i)
+def Y_Hat(W, X):
+    return np.array([predict(W, X[i,:]) for i in np.arange(len(X))])
+def L(Y, Y_hat):
+    return np.sum((Y - Y_hat)**2)*1/(len(Y))
+def e(X, Y, W): 
+    Y_hats = Y_Hat(W,X)
+    l = L(Y, Y_hats)
+    return l
+def e_prime(X, Y, W, lam):
+    ss_pred_err = e(X,Y,W)
+    ss_weights = np.sum(W**2)
+    return ss_pred_err + lam*ss_weights
+
+#initialize starting weights as all ones
+weights = np.ones(8)
 
